@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import com.mindtree.pages.HomePage;
 import com.mindtree.pages.IbiboHomepage;
+import com.mindtree.pages.IbiboSearchPage;
 import com.mindtree.utility.ExcelReader;
 import com.mindtree.utility.PropUtils;
 import com.mindtree.utility.SeleniumUtils;
@@ -21,6 +22,7 @@ import com.relevantcodes.extentreports.LogStatus;
 public class GoIbiboTestCases extends BaseTest{
 
 	public static IbiboHomepage hp = null;
+	public static IbiboSearchPage sp = null;
 	public String testName;
 	public String classname;
 	public String excelPath;
@@ -42,16 +44,53 @@ public class GoIbiboTestCases extends BaseTest{
 		//report initialization
 		report = extent.startTest(testName+" Test");
 		
-		
-		
-		
 	}
 	
+	
+	@Test(dataProvider = "goibiboTestData") 
+	  public void searchHotelAndLogHotelName(String Execution, String Testcase) {
+	  
+	  try { 
+		  excelData = ExcelReader.getXLSXvalues(excelPath, sheetName,Testcase);
+		  } catch (Exception e) { // TODO Auto-generated catch block
+			  e.printStackTrace(); 
+	  }
+	  
+	  String url = ExcelReader.getValueFromExcel(excelData, "Url");
+	  String browser  = ExcelReader.getValueFromExcel(excelData, "browser");
+	  
+	  navigateToUrl(browser, url); 
+	  SeleniumUtils.setImplicitWait(60);
+	  
+	  //page initialization 
+	  hp = new IbiboHomepage(driver); 
+	  sp = new IbiboSearchPage(driver);
+	  
+	  try { 
+		  Thread.sleep(10000); 
+		  } catch (InterruptedException e){  
+	  e.printStackTrace(); 
+	  }
+	  
+	  hp.closeLoginPopup(); 
+	  hp.verifyAndClickOnHotelsLink(); 
+	  String city =  ExcelReader.getValueFromExcel(excelData, "city");
+	  hp.enterTheDestinationAndSelectCity(city);
+	  hp.selectTheNumberOfAdults();
+	  hp.clickOnSearchButton();
+	  sp.verifySearchResultsTitle();
+	  assertion.assertAll();
+	  
+	  assertion.clearErrorLog();
+	  }
+	 
+	
+	
 	@Test(dataProvider = "goibiboTestData")
-	public void searchHotelAndLogHotelName(String Execution, String Testcase) {
+	public void searchHotelAndVerifyHotelDetail(String Execution, String Testcase) {
 		
-		//try {
 			try {
+				System.out.println(Testcase);
 				excelData = ExcelReader.getXLSXvalues(excelPath, sheetName, Testcase);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -66,6 +105,7 @@ public class GoIbiboTestCases extends BaseTest{
 			
 			//page initialization
 			hp = new IbiboHomepage(driver);
+			sp = new IbiboSearchPage(driver);
 			
 			try {
 				Thread.sleep(10000);
@@ -80,19 +120,55 @@ public class GoIbiboTestCases extends BaseTest{
 			hp.enterTheDestinationAndSelectCity(city);
 			hp.selectTheNumberOfAdults();
 			hp.clickOnSearchButton();
-			hp.verifySearchResultsTitle();
-			//hp.verifyLogoLnk();
-			//Assert.assertTrue(false);
-			assertion.assertAll();
+			sp.verifySearchResultsTitle();
+			sp.clickOnFirstSearchResult();
+			sp.verifySearchPageFunctionality();
 			
-			//assertion.clearErrorLog();
-			/*
-			 * }catch(Exception e) { e.printStackTrace();
-			 * report.log(LogStatus.FAIL,e.getMessage()); assertion.fail("TestCaseFailed");
-			 * }
-			 */
+			assertion.assertAll();
 	}
 	
+	@Test(dataProvider = "goibiboTestData")
+	public void searchHotelAndApplyFilter(String Execution, String Testcase) {
+		
+			try {
+				System.out.println(Testcase);
+				excelData = ExcelReader.getXLSXvalues(excelPath, sheetName, Testcase);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			String url = ExcelReader.getValueFromExcel(excelData, "Url");
+			String browser = ExcelReader.getValueFromExcel(excelData, "browser");
+			
+			navigateToUrl(browser, url);
+			SeleniumUtils.setImplicitWait(60);
+			
+			//page initialization
+			hp = new IbiboHomepage(driver);
+			sp = new IbiboSearchPage(driver);
+			
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			hp.closeLoginPopup();
+			hp.verifyAndClickOnHotelsLink();
+			String city = ExcelReader.getValueFromExcel(excelData, "city");
+			hp.enterTheDestinationAndSelectCity(city);
+			hp.selectTheNumberOfAdults();
+			hp.clickOnSearchButton();
+			sp.verifySearchResultsTitle();
+			sp.applyRatingfilter();
+			sp.verifySearchResultsRating(4);
+			sp.applyPricefilter();
+			sp.verifySearchResultsPrice(2000);
+			
+			assertion.assertAll();
+	}
 	
 	
 	

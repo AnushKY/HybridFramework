@@ -58,6 +58,7 @@ public class BaseTest extends ExtentReporter{
 			System.out.println("No Browser configured"); 
 		}
 		driver.get(url);
+		driver.manage().window().maximize();
 	}
 	
 	

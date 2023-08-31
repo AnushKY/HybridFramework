@@ -21,6 +21,7 @@ import com.relevantcodes.extentreports.LogStatus;
 
 
 
+
 public class SeleniumUtils extends BaseTest {
 
 	
@@ -127,6 +128,25 @@ public class SeleniumUtils extends BaseTest {
 	    public static void scrollDown(WebDriver dr, WebElement elm) {
 	        JavascriptExecutor js = (JavascriptExecutor) dr;
 	        js.executeScript("arguments[0].scrollIntoView();", elm);
+	    }
+	    
+	    public static String getText(WebDriver dr, WebElement elm, ExtentTest extentTest, String message) {
+	        String innerText = null;
+	        try {
+	            new WebDriverWait(dr, 15).until(ExpectedConditions.visibilityOf(elm));
+	            highlightElement(dr, elm);
+	            if (elm.isDisplayed()) {
+	                innerText = elm.getText().replaceAll("\\n", " ").toString();
+	                extentTest.log(LogStatus.PASS, message);
+	            } else {
+	                extentTest.log(LogStatus.FAIL, message + extentTest.addBase64ScreenShot(captureScreen(dr, message)));
+	            }
+	        } catch (Exception e) {
+	            extentTest.log(LogStatus.FAIL,
+	                    message + extentTest.addBase64ScreenShot(captureScreen(dr, message)) + e.getMessage());
+	            innerText = "";
+	        }
+	        return innerText;
 	    }
 	    
 }

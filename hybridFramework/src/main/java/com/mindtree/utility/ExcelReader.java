@@ -160,19 +160,25 @@ public static void writeXLSXvalues(String xlsxFile, String sheetName, String uni
 			int ci, cj;
 			
 			int totalRows = excelWSheet.getLastRowNum();
-			
+			int temp = 0;
+			for(int k=1;k<=totalRows;k++) {
+				String text = getCellData(k,1);
+				if(text.equalsIgnoreCase("Yes")) {
+					temp = temp+1;
+				}
+			}
 			int totalCols = 2;
-			
-			tabArray = new String[totalRows][totalCols];
+			tabArray = new String[temp][totalCols];
 			ci=0;
-			for(int i = startRow; i<= totalRows;i++, ci++) {
+			for(int i = startRow; i<= totalRows;i++,ci++) {
 				cj=0;
 				for(int j=startCol;j<=totalCols;j++, cj++) {
 					
 					if(getCellData(i,j).equalsIgnoreCase("No")) {
+						ci=ci-1;
 						break;
 					}else {
-						System.out.println(getCellData(i,j));
+						//System.out.println(getCellData(i,j));
 						tabArray[ci][cj]=getCellData(i,j);
 					}
 				}
