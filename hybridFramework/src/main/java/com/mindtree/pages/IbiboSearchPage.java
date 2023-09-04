@@ -70,6 +70,8 @@ public class IbiboSearchPage extends  BaseTest {
 	public void verifyRoomOptions() {
 		SeleniumUtils.click(driver, lnk_roomOptions, report, "clicked on Room Options");
 		SeleniumUtils.visible(driver, section_roomOpt, report, "Room options section is displayed");
+		report.log(LogStatus.PASS,report.addBase64ScreenShot(SeleniumUtils.captureScreen(driver, "room_image")));
+	
 	}
 	
 	@FindBy(xpath = IbiboHotelPageLocator.lnk_location)
