@@ -1,5 +1,8 @@
 package com.mindtree.pages;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.openqa.selenium.By;
@@ -115,5 +118,125 @@ WebDriver driver ;
 		}
 		
 	}
+	
+	@FindBy(xpath = IbiboHomePageLocator.btn_nxtArrow)
+	WebElement btn_nxtArrow;
+	
+	@FindBy(xpath = IbiboHomePageLocator.lbl_curCalMonth)
+	WebElement lbl_curCalMonth;
+	
+	@FindBy(xpath = IbiboHomePageLocator.txt_checkInStart)
+	WebElement txt_checkInStart;
+	
+	@FindBy(xpath = IbiboHomePageLocator.txt_checkInEnd)
+	WebElement txt_checkInEnd;
+	
+public void selectMonthAndYear(String expDate, WebElement curMonthYear) {
+		
+		String expYearStr = expDate.split(" ")[2];
+		int expYear = Integer.parseInt(expYearStr);
+		System.out.println("Expected Year"+expYear);
+		
+		String expMonth = expDate.split(" ")[1];
+		System.out.println("Expected Month"+expMonth);
+	
+		String currMonthYear = curMonthYear.getText();
+		String month = currMonthYear.split(" ")[0];
+		System.out.println("Actual Month"+month);
+		String year = currMonthYear.split(" ")[1];
+		int actYear = Integer.parseInt(year);
+		System.out.println("Actual Year"+actYear);
+		if(expYear>=actYear) {
+			
+			while(expYear<actYear) {
+				btn_nxtArrow.click();
+				currMonthYear = curMonthYear.getText();
+				year = currMonthYear.split(" ")[1];
+				actYear = Integer.parseInt(year);
+			}
+			
+			while(!expMonth.equalsIgnoreCase(month)) {
+				btn_nxtArrow.click();
+				currMonthYear = curMonthYear.getText();
+				month = currMonthYear.split(" ")[0];
+			}
+			
+			
+		}else {
+			System.out.println(expYear+" should be greater than or equal to"+actYear);
+		}
+		
+	}
+
+
+public void selectDate(String date) {
+	
+	
+	try {
+		Date date1 = new SimpleDateFormat("dd MMMM yyyy").parse(date);
+		System.out.println(date+"\t"+date1);
+		String pattern = "dd_MM_yyyy";
+		SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+		String finaldate = simpleDateFormat.format(date1);
+		System.out.println(finaldate);
+		String oldmonth = finaldate.split("_")[1];
+		System.out.println("Oldmonth"+oldmonth);
+		if(oldmonth.equalsIgnoreCase("01")|oldmonth.equalsIgnoreCase("1")) {
+			finaldate = finaldate.replaceAll("_01","_0");
+			finaldate = "date_"+finaldate;
+			System.out.println(finaldate);
+		}else {
+			int monthInInt = Integer.parseInt(oldmonth);
+			monthInInt = monthInInt-1;
+			String newmonth = Integer.toString(monthInInt);
+			System.out.println("newmonth"+newmonth);
+			finaldate = finaldate.replaceAll("_"+oldmonth,"_"+newmonth);
+			System.out.println("finalDate : "+finaldate);
+			finaldate = "date_"+finaldate;
+			finaldate = finaldate.replaceAll("_0","_");
+			System.out.println(finaldate);
+			
+		}
+		
+		WebElement ele_Date = driver.findElement(By.xpath(".//span[@data-testid='"+finaldate+"']"));
+		ele_Date.click();
+		
+	} catch (ParseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	
+	
+	
+}
+
+
+public void selectStartDate(String date) {
+	selectMonthAndYear(date,lbl_curCalMonth);
+	selectDate(date);
+}
+
+public void selectEndDate(String date) {
+	selectMonthAndYear(date,lbl_curCalMonth);
+	selectDate(date);
+}
+
+public void selectCheckINAndCheckoutDate(String startDate, String endDate) {
+	txt_checkInStart.click();
+	selectStartDate(startDate);
+	try {
+		Thread.sleep(5000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	selectEndDate(endDate);
+	try {
+		Thread.sleep(5000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+}
 	
 }

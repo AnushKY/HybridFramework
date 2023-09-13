@@ -171,6 +171,54 @@ public class GoIbiboTestCases extends BaseTest{
 	}
 	
 	
+	@Test(dataProvider = "goibiboTestData") 
+	  public void searchHotelAndVerifyBooking(String Execution, String Testcase) {
+	  
+	  try { 
+		  excelData = ExcelReader.getXLSXvalues(excelPath, sheetName,Testcase);
+		  } catch (Exception e) { // TODO Auto-generated catch block
+			  e.printStackTrace(); 
+	  }
+	  
+	  String url = ExcelReader.getValueFromExcel(excelData, "Url");
+	  String browser  = ExcelReader.getValueFromExcel(excelData, "browser");
+	  
+	  navigateToUrl(browser, url); 
+	  SeleniumUtils.setImplicitWait(60);
+	  
+	  //page initialization 
+	  hp = new IbiboHomepage(driver); 
+	  sp = new IbiboSearchPage(driver);
+	  
+	  try { 
+		  Thread.sleep(10000); 
+		  } catch (InterruptedException e){  
+	  e.printStackTrace(); 
+	  }
+	  
+	  hp.closeLoginPopup(); 
+	  hp.verifyAndClickOnHotelsLink(); 
+	  String city =  ExcelReader.getValueFromExcel(excelData, "city");
+	  hp.enterTheDestinationAndSelectCity(city);
+	  hp.selectCheckINAndCheckoutDate("15 September 2023","18 September 2023");
+	  hp.selectTheNumberOfAdults();
+	  hp.clickOnSearchButton();
+	  sp.verifySearchResultsTitle();
+	  sp.clickOnFirstSearchResult();
+	  sp.verifyRoomBookingFunctionality();
+	  
+	  try {
+		Thread.sleep(10000);
+	} catch (InterruptedException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+		
+	  assertion.assertAll();
+	  
+	  assertion.clearErrorLog();
+	  }
+	
 	
 	@DataProvider(name="goibiboTestData")
 	public Object[][] homePageDetail() throws Exception{
